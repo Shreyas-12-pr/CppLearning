@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    int longestBalancedSubstring(string s) {
+        int n = s.size();
+        int maxLen = 0;
+
+        for (int i = 0; i < n; i++) {
+            int freq[26] = {0};
+
+            for (int j = i; j < n; j++) {
+                freq[s[j] - 'a']++;
+
+                int sameCount = 0;
+                bool valid = true;
+
+                for (int k = 0; k < 26; k++) {
+                    if (freq[k] > 0) {
+                        if (sameCount == 0)
+                            sameCount = freq[k];
+                        else if (freq[k] != sameCount) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (valid) {
+                    maxLen = max(maxLen, j - i + 1);
+                }
+            }
+        }
+
+        return maxLen;
+    }
+};
+
+int main() {
+    Solution sol;
+    cout << sol.longestBalancedSubstring("abbac") << endl;
+    return 0;
+}
