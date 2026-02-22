@@ -1,0 +1,22 @@
+class Solution {
+public:
+    int binaryGap(int n) {
+        int lastPos = -1;      // Position of previous '1'
+        int maxDistance = 0;   // Maximum distance found
+        int position = 0;      // Current bit position
+        
+        while (n > 0) {
+            if (n & 1) {  // If current bit is 1
+                if (lastPos != -1) {
+                    maxDistance = max(maxDistance, position - lastPos);
+                }
+                lastPos = position;
+            }
+            
+            n >>= 1;  // Shift right
+            position++;
+        }
+        
+        return maxDistance;
+    }
+};
