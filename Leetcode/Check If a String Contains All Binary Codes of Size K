@@ -1,0 +1,33 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    bool hasAllCodes(string s, int k) {
+        int n = s.size();
+        
+        // If total substrings possible < total binary codes
+        if (n < k || (1 << k) > n - k + 1) 
+            return false;
+
+        unordered_set<int> seen;
+        int current = 0;
+        int mask = (1 << k) - 1;  // Keeps only last k bits
+
+        for (int i = 0; i < n; i++) {
+            // Shift left and add new bit
+            current = ((current << 1) & mask) | (s[i] - '0');
+
+            // Start storing once window size reaches k
+            if (i >= k - 1) {
+                seen.insert(current);
+
+                // Early exit if all found
+                if (seen.size() == (1 << k))
+                    return true;
+            }
+        }
+
+        return seen.size() == (1 << k);
+    }
+};
