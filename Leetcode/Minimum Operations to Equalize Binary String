@@ -1,0 +1,43 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    int minOperations(string s, int k) {
+        int n = s.size();
+        int zeroCount = 0;
+        
+        for (char c : s) {
+            if (c == '0') zeroCount++;
+        }
+        
+        // Already all 1s
+        if (zeroCount == 0) return 0;
+        
+        // Special case: k == n
+        if (k == n) {
+            if (zeroCount == n) return 1;
+            return -1;
+        }
+        
+        // Minimum operations needed to cover all zeros
+        long long x = (zeroCount + k - 1) / k;  // ceil(zeroCount / k)
+        
+        // Adjust x until parity condition is satisfied
+        while (true) {
+            long long totalFlips = x * 1LL * k;
+            
+            if (totalFlips >= zeroCount && 
+                (totalFlips - zeroCount) % 2 == 0) {
+                return x;
+            }
+            
+            x++;
+            
+            // If too many operations, stop
+            if (x > n) break;
+        }
+        
+        return -1;
+    }
+};
