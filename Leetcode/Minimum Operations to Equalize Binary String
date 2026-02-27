@@ -1,43 +1,53 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <algorithm>
+
 using namespace std;
 
 class Solution {
 public:
     int minOperations(string s, int k) {
-        int n = s.size();
-        int zeroCount = 0;
-        
+        int n = s.length();
+        int initial_zeros = 0;
         for (char c : s) {
-            if (c == '0') zeroCount++;
+            if (c == '0') initial_zeros++;
         }
+
+        // If there are already no zeros, we are done.
+        if (initial_zeros == 0) return 0;
+
+        // BFS to find the shortest path from 'initial_zeros' to '0'
+        queue<pair<int, int>> q; // {current_zeros, steps}
+        q.push({initial_zeros, 0});
         
-        // Already all 1s
-        if (zeroCount == 0) return 0;
-        
-        // Special case: k == n
-        if (k == n) {
-            if (zeroCount == n) return 1;
-            return -1;
-        }
-        
-        // Minimum operations needed to cover all zeros
-        long long x = (zeroCount + k - 1) / k;  // ceil(zeroCount / k)
-        
-        // Adjust x until parity condition is satisfied
-        while (true) {
-            long long totalFlips = x * 1LL * k;
-            
-            if (totalFlips >= zeroCount && 
-                (totalFlips - zeroCount) % 2 == 0) {
-                return x;
+        vector<bool> visited(n + 1, false);
+        visited[initial_zeros] = true;
+
+        while (!q.empty()) {
+            auto [curr_z, steps] = q.front();
+            q.pop();
+
+            // We want to reach 0 zeros
+            if (curr_z == 0) return steps;
+
+            // We flip 'i' zeros and 'k-i' ones
+            // Boundary: i <= curr_z AND (k-i) <= (n - curr_z)
+            // Rearranging: i >= k - (n - curr_z)
+            int min_i = max(0, k - (n - curr_z));
+            int max_i = min(curr_z, k);
+
+            for (int i = min_i; i <= max_i; ++i) {
+                int next_z = curr_z + k - 2 * i;
+                
+                if (next_z >= 0 && next_z <= n && !visited[next_z]) {
+                    visited[next_z] = true;
+                    q.push({next_z, steps + 1});
+                }
             }
-            
-            x++;
-            
-            // If too many operations, stop
-            if (x > n) break;
         }
-        
+
         return -1;
     }
 };
