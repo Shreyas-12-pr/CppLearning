@@ -3,7 +3,8 @@ setlocal
 
 echo ==========================================================
 echo      G++ Compiler (MinGW-w64) Installer for Windows
-echo ==========================================================
+echo ================
+==========================================
 echo.
 
 :: Check for Administrator privileges
