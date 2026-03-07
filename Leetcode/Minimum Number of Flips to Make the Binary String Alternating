@@ -1,0 +1,29 @@
+class Solution {
+public:
+    int minFlips(string s) {
+        int n = s.size();
+        string s2 = s + s;
+
+        int diff1 = 0, diff2 = 0;
+        int ans = INT_MAX;
+        int left = 0;
+
+        for (int right = 0; right < 2 * n; right++) {
+
+            if (s2[right] != (right % 2 ? '1' : '0')) diff1++;
+            if (s2[right] != (right % 2 ? '0' : '1')) diff2++;
+
+            if (right - left + 1 > n) {
+                if (s2[left] != (left % 2 ? '1' : '0')) diff1--;
+                if (s2[left] != (left % 2 ? '0' : '1')) diff2--;
+                left++;
+            }
+
+            if (right - left + 1 == n) {
+                ans = min(ans, min(diff1, diff2));
+            }
+        }
+
+        return ans;
+    }
+};
