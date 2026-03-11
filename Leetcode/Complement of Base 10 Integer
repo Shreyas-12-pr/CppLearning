@@ -1,0 +1,20 @@
+class Solution {
+public:
+    int bitwiseComplement(int n) {
+        // Edge case: if n is 0, binary is "0", complement is "1"
+        if (n == 0) return 1;
+        
+        unsigned int mask = 0;
+        int temp = n;
+        
+        // Create a mask with all 1s of the same length as n
+        // e.g., if n = 5 (101), mask becomes 7 (111)
+        while (temp > 0) {
+            mask = (mask << 1) | 1;
+            temp >>= 1;
+        }
+        
+        // XOR n with the mask to flip all bits
+        return n ^ mask;
+    }
+};
