@@ -1,0 +1,51 @@
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+class Solution {
+public:
+    long long minNumberOfSeconds(int mountainHeight, vector<int>& workerTimes) {
+        // Range for binary search
+        // Low: 1 second
+        // High: The slowest case (one worker with max time reducing max height)
+        long long low = 1;
+        long long high = 0;
+        
+        // Calculate a safe upper bound: workerTimes[i] * h * (h + 1) / 2
+        long long maxW = *min_element(workerTimes.begin(), workerTimes.end());
+        high = (long long)maxW * mountainHeight * (mountainHeight + 1) / 2;
+
+        long long ans = high;
+
+        while (low <= high) {
+            long long mid = low + (high - low) / 2;
+            if (canReduceHeight(mid, mountainHeight, workerTimes)) {
+                ans = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return ans;
+    }
+
+private:
+    bool canReduceHeight(long long timeLimit, int targetHeight, const vector<int>& workerTimes) {
+        long long totalReduced = 0;
+        
+        for (int wTime : workerTimes) {
+            // Solve: wTime * x * (x + 1) / 2 <= timeLimit
+            // x^2 + x - (2 * timeLimit / wTime) <= 0
+            long long val = (2 * timeLimit) / wTime;
+            // Using quadratic formula: x = (-1 + sqrt(1 + 4 * val)) / 2
+            long long x = (sqrt(1 + 4 * val) - 1) / 2;
+            
+            totalReduced += x;
+            if (totalReduced >= targetHeight) return true;
+        }
+        
+        return totalReduced >= targetHeight;
+    }
+};
