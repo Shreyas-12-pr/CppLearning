@@ -1,0 +1,41 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+class Solution {
+public:
+    string getHappyString(int n, int k) {
+        string current = "";
+        string result = "";
+        int count = 0;
+        
+        backtrack(n, k, current, count, result);
+        
+        return result;
+    }
+
+private:
+    void backtrack(int n, int k, string& current, int& count, string& result) {
+        // If we found the kth string, stop searching
+        if (!result.empty()) return;
+
+        // Base case: string reached desired length
+        if (current.length() == n) {
+            count++;
+            if (count == k) {
+                result = current;
+            }
+            return;
+        }
+
+        // Try adding 'a', 'b', and 'c'
+        for (char c : {'a', 'b', 'c'}) {
+            // Check if it's a "happy" move
+            if (current.empty() || current.back() != c) {
+                current.push_back(c);
+                backtrack(n, k, current, count, result);
+                current.pop_back(); // Undo move
+            }
+        }
+    }
+};
