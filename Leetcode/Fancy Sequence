@@ -1,0 +1,52 @@
+#include <vector>
+
+using namespace std;
+
+class Fancy {
+    long long a = 1; // Global multiplier
+    long long b = 0; // Global increment
+    vector<long long> nums;
+    const int MOD = 1e9 + 7;
+
+    // Fast Power to find Modular Inverse via Fermat's Little Theorem
+    long long power(long long base, long long exp) {
+        long long res = 1;
+        base %= MOD;
+        while (exp > 0) {
+            if (exp % 2 == 1) res = (res * base) % MOD;
+            base = (base * base) % MOD;
+            exp /= 2;
+        }
+        return res;
+    }
+
+    long long modInverse(long long n) {
+        return power(n, MOD - 2);
+    }
+
+public:
+    Fancy() {}
+
+    void append(int val) {
+        // Store val such that (val_stored * a + b) % MOD == val
+        // val_stored = (val - b) * inv(a)
+        long long val_stored = (val - b + MOD) % MOD;
+        val_stored = (val_stored * modInverse(a)) % MOD;
+        nums.push_back(val_stored);
+    }
+
+    void addAll(int inc) {
+        b = (b + inc) % MOD;
+    }
+
+    void multAll(int m) {
+        a = (a * m) % MOD;
+        b = (b * m) % MOD;
+    }
+
+    int getIndex(int idx) {
+        if (idx >= nums.size()) return -1;
+        // Apply current global transformation to the stored value
+        return (nums[idx] * a + b) % MOD;
+    }
+};
