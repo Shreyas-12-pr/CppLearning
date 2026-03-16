@@ -1,0 +1,57 @@
+#include <vector>
+#include <set>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<int> getBiggestThree(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        set<int> sums;
+
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                // Every single cell is a rhombus of radius 0
+                sums.insert(grid[i][j]);
+
+                // Try expanding the radius 'r'
+                for (int r = 1; ; ++r) {
+                    // Check if corners are within bounds
+                    if (i - r < 0 || i + r >= m || j - r < 0 || j + r >= n) break;
+
+                    int currentSum = 0;
+                    
+                    // Top and Bottom corners
+                    currentSum += grid[i - r][j];
+                    currentSum += grid[i + r][j];
+                    // Left and Right corners
+                    currentSum += grid[i][j - r];
+                    currentSum += grid[i][j + r];
+
+                    // Now add the boundary cells between corners
+                    // We iterate from 1 to r-1 to avoid double-counting corners
+                    for (int k = 1; k < r; ++k) {
+                        currentSum += grid[i - k][j + (r - k)]; // Top-right edge
+                        currentSum += grid[i + k][j + (r - k)]; // Bottom-right edge
+                        currentSum += grid[i - k][j - (r - k)]; // Top-left edge
+                        currentSum += grid[i + k][j - (r - k)]; // Bottom-left edge
+                    }
+
+                    sums.insert(currentSum);
+                }
+            }
+        }
+
+        // Convert set to a descending vector
+        vector<int> result(sums.rbegin(), sums.rend());
+        
+        // Return only the top 3
+        if (result.size() > 3) {
+            result.resize(3);
+        }
+        
+        return result;
+    }
+};
