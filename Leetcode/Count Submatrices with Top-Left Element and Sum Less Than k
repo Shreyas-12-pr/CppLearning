@@ -1,0 +1,41 @@
+#include <vector>
+
+class Solution {
+public:
+    int countSubmatrices(std::vector<std::vector<int>>& grid, int k) {
+        int m = grid.size();
+        int n = grid[0].size();
+        int count = 0;
+
+        // We can modify the grid in-place to store prefix sums 
+        // or use a 2D vector. In-place saves memory.
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                // Add the value from the left neighbor
+                if (j > 0) {
+                    grid[i][j] += grid[i][j - 1];
+                }
+                // Add the value from the top neighbor
+                if (i > 0) {
+                    grid[i][j] += grid[i - 1][j];
+                }
+                // Subtract the top-left diagonal (added twice by top and left)
+                if (i > 0 && j > 0) {
+                    grid[i][j] -= grid[i - 1][j - 1];
+                }
+
+                // If the current submatrix sum is within k, increment count
+                if (grid[i][j] <= k) {
+                    count++;
+                } else {
+                    // Optimization: Since elements are non-negative, 
+                    // if grid[i][j] > k, all submatrices extending 
+                    // further right in this row will also exceed k.
+                    break; 
+                }
+            }
+        }
+
+        return count;
+    }
+};
