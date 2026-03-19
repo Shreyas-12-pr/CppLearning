@@ -1,0 +1,41 @@
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    int numberOfSubmatrices(vector<vector<char>>& grid) {
+        int rows = grid.size();
+        int cols = grid[0].size();
+        
+        // We use 2D prefix sums to track counts of 'X' and 'Y'
+        // prefixX[i][j] = count of 'X' in submatrix from (0,0) to (i-1, j-1)
+        vector<vector<int>> prefixX(rows + 1, vector<int>(cols + 1, 0));
+        vector<vector<int>> prefixY(rows + 1, vector<int>(cols + 1, 0));
+        
+        int count = 0;
+        
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                // Standard 2D prefix sum formula: 
+                // Current cell contribution + Top + Left - Top-Left Diagonal
+                prefixX[i + 1][j + 1] = (grid[i][j] == 'X') 
+                                        + prefixX[i][j + 1] 
+                                        + prefixX[i + 1][j] 
+                                        - prefixX[i][j];
+                
+                prefixY[i + 1][j + 1] = (grid[i][j] == 'Y') 
+                                        + prefixY[i][j + 1] 
+                                        + prefixY[i + 1][j] 
+                                        - prefixY[i][j];
+                
+                // Condition: Equals counts of X and Y, and at least one X
+                if (prefixX[i + 1][j + 1] > 0 && prefixX[i + 1][j + 1] == prefixY[i + 1][j + 1]) {
+                    count++;
+                }
+            }
+        }
+        
+        return count;
+    }
+};
