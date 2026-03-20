@@ -1,0 +1,56 @@
+#include <vector>
+#include <algorithm>
+#include <climits>
+#include <set>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<int>> minAbsDiff(vector<vector<int>>& grid, int k) {
+        int m = grid.size();
+        int n = grid[0].size();
+        
+        int resRows = m - k + 1;
+        int resCols = n - k + 1;
+        vector<vector<int>> ans(resRows, vector<int>(resCols));
+
+        for (int i = 0; i < resRows; ++i) {
+            for (int j = 0; j < resCols; ++j) {
+                // Use a set to automatically handle duplicates and sorting
+                set<int> distinctElements;
+                
+                for (int r = i; r < i + k; ++r) {
+                    for (int c = j; c < j + k; ++c) {
+                        distinctElements.insert(grid[r][c]);
+                    }
+                }
+
+                // If there is 1 or 0 distinct values, result is 0 per problem note
+                if (distinctElements.size() <= 1) {
+                    ans[i][j] = 0;
+                    continue;
+                }
+
+                int minDiff = INT_MAX;
+                // Compare adjacent elements in the sorted set
+                auto it = distinctElements.begin();
+                int prev = *it;
+                ++it;
+                
+                while (it != distinctElements.end()) {
+                    int current = *it;
+                    minDiff = min(minDiff, current - prev);
+                    prev = current;
+                    // Optimization: 1 is the smallest possible difference > 0
+                    if (minDiff == 1) break;
+                    ++it;
+                }
+
+                ans[i][j] = minDiff;
+            }
+        }
+
+        return ans;
+    }
+};
