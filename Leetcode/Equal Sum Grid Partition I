@@ -1,0 +1,49 @@
+#include <vector>
+#include <numeric>
+
+using namespace std;
+
+class Solution {
+public:
+    // Renamed from canPartition to canPartitionGrid to match the expected signature
+    bool canPartitionGrid(vector<vector<int>>& grid) {
+        int m = grid.size();
+        if (m == 0) return false;
+        int n = grid[0].size();
+        
+        long long totalSum = 0;
+        
+        // Calculate the sum of all elements in the grid
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                totalSum += grid[i][j];
+            }
+        }
+        
+        // If the total sum is odd, we can't split it into two equal integers
+        if (totalSum % 2 != 0) return false;
+        long long target = totalSum / 2;
+
+        // 1. Check Horizontal Cuts (between rows)
+        // We sum up row by row and stop at m-1 to ensure non-empty sections
+        long long rowSumPrefix = 0;
+        for (int i = 0; i < m - 1; ++i) {
+            for (int j = 0; j < n; ++j) {
+                rowSumPrefix += grid[i][j];
+            }
+            if (rowSumPrefix == target) return true;
+        }
+
+        // 2. Check Vertical Cuts (between columns)
+        // We sum up column by column and stop at n-1 to ensure non-empty sections
+        long long colSumPrefix = 0;
+        for (int j = 0; j < n - 1; ++j) {
+            for (int i = 0; i < m; ++i) {
+                colSumPrefix += grid[i][j];
+            }
+            if (colSumPrefix == target) return true;
+        }
+
+        return false;
+    }
+};
