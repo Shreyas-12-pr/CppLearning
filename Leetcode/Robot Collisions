@@ -1,0 +1,84 @@
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <numeric>
+#include <stack>
+
+using namespace std;
+
+struct Robot {
+    int id;
+    int pos;
+    int health;
+    char dir;
+};
+
+class Solution {
+public:
+    vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions) {
+        int n = positions.size();
+        vector<Robot> robots(n);
+
+        for (int i = 0; i < n; ++i) {
+            robots[i] = {i, positions[i], healths[i], directions[i]};
+        }
+
+        // 1. Sort robots by their physical position on the line
+        sort(robots.begin(), robots.end(), [](const Robot& a, const Robot& b) {
+            return a.pos < b.pos;
+        });
+
+        stack<Robot> st;
+        vector<Robot> survivors;
+
+        for (auto& curr : robots) {
+            if (curr.dir == 'R') {
+                // Moving Right: No immediate collision possible with robots to the left
+                st.push(curr);
+            } else {
+                // Moving Left: Check for collisions with robots moving Right in the stack
+                while (!st.empty() && curr.health > 0) {
+                    Robot& topRobot = st.top();
+                    
+                    if (curr.health > topRobot.health) {
+                        // Current 'L' robot wins
+                        curr.health -= 1;
+                        st.pop();
+                    } else if (curr.health < topRobot.health) {
+                        // Stack 'R' robot wins
+                        topRobot.health -= 1;
+                        curr.health = 0;
+                    } else {
+                        // Both destroyed
+                        curr.health = 0;
+                        st.pop();
+                    }
+                }
+                
+                // If 'L' robot survived all collisions with 'R' robots
+                if (curr.health > 0) {
+                    survivors.push_back(curr);
+                }
+            }
+        }
+
+        // Add remaining 'R' robots from stack to survivors
+        while (!st.empty()) {
+            survivors.push_back(st.top());
+            st.pop();
+        }
+
+        // 2. Sort survivors by their original input index
+        sort(survivors.begin(), survivors.end(), [](const Robot& a, const Robot& b) {
+            return a.id < b.id;
+        });
+
+        // 3. Extract healths
+        vector<int> result;
+        for (const auto& r : survivors) {
+            result.push_back(r.health);
+        }
+
+        return result;
+    }
+};
