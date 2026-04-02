@@ -1,0 +1,71 @@
+#include <vector>
+#include <algorithm>
+#include <climits>
+
+using namespace std;
+
+class Solution {
+public:
+    int maximumAmount(vector<vector<int>>& coins) {
+        int m = coins.size();
+        int n = coins[0].size();
+
+        // dp[i][j][k] represents max coins at (i, j) with k neutralizations used
+        // Using k = 0, 1, 2 to track how many special abilities have been spent
+        vector<vector<vector<long long>>> dp(m, vector<vector<long long>>(n, vector<long long>(3, LLONG_MIN)));
+
+        // Base case: Starting point (0, 0)
+        for (int k = 0; k < 3; ++k) {
+            if (coins[0][0] < 0) {
+                // If we use a neutralization at (0,0)
+                if (k > 0) dp[0][0][k] = 0; 
+                // If we don't use it
+                dp[0][0][0] = coins[0][0];
+            } else {
+                // Positive coins are always collected
+                dp[0][0][k] = coins[0][0];
+            }
+        }
+
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (i == 0 && j == 0) continue;
+
+                for (int k = 0; k < 3; ++k) {
+                    long long prev_max = LLONG_MIN;
+                    
+                    // Coming from Top
+                    if (i > 0) prev_max = max(prev_max, dp[i-1][j][k]);
+                    // Coming from Left
+                    if (j > 0) prev_max = max(prev_max, dp[i][j-1][k]);
+
+                    if (prev_max == LLONG_MIN) continue;
+
+                    // Case 1: Robber at current cell
+                    if (coins[i][j] < 0) {
+                        // Option 1: Don't neutralize (stay in current k)
+                        dp[i][j][k] = max(dp[i][j][k], prev_max + coins[i][j]);
+                        
+                        // Option 2: Use neutralization (move from k-1 to k)
+                        if (k > 0) {
+                            long long prev_k_minus_1 = LLONG_MIN;
+                            if (i > 0) prev_k_minus_1 = max(prev_k_minus_1, dp[i-1][j][k-1]);
+                            if (j > 0) prev_k_minus_1 = max(prev_k_minus_1, dp[i][j-1][k-1]);
+                            
+                            if (prev_k_minus_1 != LLONG_MIN) {
+                                dp[i][j][k] = max(dp[i][j][k], prev_k_minus_1);
+                            }
+                        }
+                    } 
+                    // Case 2: Positive coins or zero
+                    else {
+                        dp[i][j][k] = max(dp[i][j][k], prev_max + coins[i][j]);
+                    }
+                }
+            }
+        }
+
+        // The answer is the maximum of having 0, 1, or 2 neutralizations used at the finish
+        return (int)max({dp[m-1][n-1][0], dp[m-1][n-1][1], dp[m-1][n-1][2]});
+    }
+};
