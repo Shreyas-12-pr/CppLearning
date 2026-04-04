@@ -1,0 +1,29 @@
+#include <string>
+#include <vector>
+
+class Solution {
+public:
+    string decodeCiphertext(string encodedText, int rows) {
+        if (rows == 1) return encodedText;
+        
+        int n = encodedText.length();
+        int cols = n / rows;
+        string res = "";
+        
+        // The original text starts from each column of the first row
+        // and moves diagonally down-right (row+1, col+1)
+        for (int j = 0; j < cols; ++j) {
+            for (int r = 0, c = j; r < rows && c < cols; ++r, ++c) {
+                // Linear index in the encodedText string: row * total_cols + current_col
+                res += encodedText[r * cols + c];
+            }
+        }
+        
+        // Remove trailing spaces as per problem constraints
+        while (!res.empty() && res.back() == ' ') {
+            res.pop_back();
+        }
+        
+        return res;
+    }
+};
