@@ -1,0 +1,33 @@
+#include <vector>
+#include <algorithm>
+
+class Solution {
+public:
+    int maxDistance(std::vector<int>& nums1, std::vector<int>& nums2) {
+        int max_dist = 0;
+        int i = 0; // Pointer for nums1
+        int j = 0; // Pointer for nums2
+        int n1 = nums1.size();
+        int n2 = nums2.size();
+
+        while (i < n1 && j < n2) {
+            // Check if the current pair is valid
+            if (nums1[i] <= nums2[j]) {
+                // If valid, update the maximum distance found so far
+                max_dist = std::max(max_dist, j - i);
+                // Try to increase j to see if we can get a larger distance
+                j++;
+            } else {
+                // If nums1[i] > nums2[j], this i cannot pair with this or any later j
+                // So we move to the next i
+                i++;
+                // Optimization: j must be at least i for a valid pair
+                if (j < i) {
+                    j = i;
+                }
+            }
+        }
+
+        return max_dist;
+    }
+};
