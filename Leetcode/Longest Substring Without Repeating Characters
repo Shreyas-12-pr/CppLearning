@@ -1,0 +1,30 @@
+#include <string>
+#include <vector>
+#include <algorithm>
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(std::string s) {
+        // m stores the last index of each character (initialized to -1)
+        std::vector<int> m(256, -1);
+        
+        int maxLength = 0;
+        int left = 0;
+        
+        for (int right = 0; right < s.length(); right++) {
+            // If the character is already in the window, 
+            // jump the 'left' pointer to avoid duplicates
+            if (m[s[right]] >= left) {
+                left = m[s[right]] + 1;
+            }
+            
+            // Update the last seen index of the character
+            m[s[right]] = right;
+            
+            // Calculate current window size and update maxLength
+            maxLength = std::max(maxLength, right - left + 1);
+        }
+        
+        return maxLength;
+    }
+};
