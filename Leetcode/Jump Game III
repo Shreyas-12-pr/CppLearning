@@ -1,0 +1,47 @@
+#include <vector>
+#include <queue>
+
+class Solution {
+public:
+    bool canReach(std::vector<int>& arr, int start) {
+        // Queue for BFS storing the indices
+        std::queue<int> q;
+        q.push(start);
+        
+        while (!q.empty()) {
+            int curr = q.front();
+            q.pop();
+            
+            // If we found the target value 0, return true
+            if (arr[curr] == 0) {
+                return true;
+            }
+            
+            // If the element is negative, it means we have already visited this index
+            if (arr[curr] < 0) {
+                continue;
+            }
+            
+            // Get the jump length
+            int jump = arr[curr];
+            
+            // Mark the current index as visited by making it negative
+            arr[curr] = -arr[curr];
+            
+            // Check right jump: i + arr[i]
+            int right = curr + jump;
+            if (right < arr.size() && arr[right] >= 0) {
+                q.push(right);
+            }
+            
+            // Check left jump: i - arr[i]
+            int left = curr - jump;
+            if (left >= 0 && arr[left] >= 0) {
+                q.push(left);
+            }
+        }
+        
+        // If the queue becomes empty and we haven't hit 0, it's unreachable
+        return false;
+    }
+};
