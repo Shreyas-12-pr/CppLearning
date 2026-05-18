@@ -1,0 +1,78 @@
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <list>
+
+using namespace std;
+
+class Solution {
+public:
+    int minJumps(vector<int>& arr) {
+        int n = arr.size();
+        if (n <= 1) {
+            return 0;
+        }
+
+        unordered_map<int, vector<int>> graph;
+        for (int i = 0; i < n; i++) {
+            graph[arr[i]].push_back(i);
+        }
+
+        unordered_set<int> curs; // store layers from start
+        curs.insert(0);
+        unordered_set<int> visited;
+        visited.insert(0);
+        visited.insert(n - 1);
+        int step = 0;
+
+        unordered_set<int> other; // store layers from end
+        other.insert(n - 1);
+
+        // when current layer exists
+        while (!curs.empty()) {
+            // search from the side with fewer nodes
+            if (curs.size() > other.size()) {
+                swap(curs, other);
+            }
+
+            unordered_set<int> nex;
+
+            // iterate the layer
+            for (int node : curs) {
+
+                // check same value
+                for (int child : graph[arr[node]]) {
+                    if (other.count(child)) {
+                        return step + 1;
+                    }
+                    if (!visited.count(child)) {
+                        visited.insert(child);
+                        nex.insert(child);
+                    }
+                }
+
+                // clear the list to prevent redundant search
+                graph[arr[node]].clear();
+
+                // check neighbors
+                if (other.count(node + 1) || other.count(node - 1)) {
+                    return step + 1;
+                }
+
+                if (node + 1 < n && !visited.count(node + 1)) {
+                    visited.insert(node + 1);
+                    nex.insert(node + 1);
+                }
+                if (node - 1 >= 0 && !visited.count(node - 1)) {
+                    visited.insert(node - 1);
+                    nex.insert(node - 1);
+                }
+            }
+
+            curs = move(nex);
+            step++;
+        }
+
+        return -1;
+    }
+};
