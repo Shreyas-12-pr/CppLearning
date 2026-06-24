@@ -1,0 +1,90 @@
+class Solution {
+public:
+    static constexpr long long MOD = 1000000007LL;
+
+    vector<long long> matVecMul(const vector<vector<long long>>& M,
+                                const vector<long long>& v) {
+        int n = M.size();
+        vector<long long> res(n, 0);
+
+        for (int i = 0; i < n; i++) {
+            long long s = 0;
+            for (int j = 0; j < n; j++) {
+                if (M[i][j]) {
+                    s = (s + M[i][j] * v[j]) % MOD;
+                }
+            }
+            res[i] = s;
+        }
+        return res;
+    }
+
+    vector<vector<long long>> matMul(const vector<vector<long long>>& A,
+                                     const vector<vector<long long>>& B) {
+        int n = A.size();
+        vector<vector<long long>> res(n, vector<long long>(n, 0));
+
+        for (int i = 0; i < n; i++) {
+            for (int k = 0; k < n; k++) {
+                if (!A[i][k]) continue;
+                long long a = A[i][k];
+
+                for (int j = 0; j < n; j++) {
+                    if (!B[k][j]) continue;
+                    res[i][j] = (res[i][j] + a * B[k][j]) % MOD;
+                }
+            }
+        }
+        return res;
+    }
+
+    int zigZagArrays(int n, int l, int r) {
+        int m = r - l + 1;
+
+        vector<vector<long long>> C(m, vector<long long>(m, 0));
+
+        // C[i][j] = max(0, i - j - 1)
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j + 1 < i; j++) {
+                C[i][j] = i - j - 1;
+            }
+        }
+
+        vector<long long> vec;
+        long long exp;
+
+        if (n & 1) {
+            // P3[i] = sum_{u<i}(m-1-u)
+            vec.assign(m, 0);
+            for (int i = 0; i < m; i++) {
+                vec[i] = 1LL * i * (m - 1)
+                       - 1LL * i * (i - 1) / 2;
+            }
+            exp = (n - 3) / 2;
+        } else {
+            // P2[i] = i
+            vec.resize(m);
+            for (int i = 0; i < m; i++) vec[i] = i;
+            exp = (n - 2) / 2;
+        }
+
+        auto power = C;
+
+        while (exp > 0) {
+            if (exp & 1) {
+                vec = matVecMul(power, vec);
+            }
+            exp >>= 1;
+            if (exp) {
+                power = matMul(power, power);
+            }
+        }
+
+        long long ans = 0;
+        for (long long x : vec) {
+            ans = (ans + x) % MOD;
+        }
+
+        return (int)((2 * ans) % MOD);
+    }
+};
