@@ -1,0 +1,39 @@
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries) {
+        // This array will store the component ID for each node
+        vector<int> component(n, 0);
+        int currentComponent = 0;
+        
+        // Pass through the sorted array to build connected components
+        for (int i = 1; i < n; ++i) {
+            // If the gap exceeds maxDiff, we start a new distinct component
+            if (nums[i] - nums[i - 1] > maxDiff) {
+                currentComponent++;
+            }
+            component[i] = currentComponent;
+        }
+        
+        // Process each query
+        vector<bool> answer;
+        answer.reserve(queries.size());
+        
+        for (const auto& query : queries) {
+            int u = query[0];
+            int v = query[1];
+            
+            // If they are in the same component, a path exists
+            if (component[u] == component[v]) {
+                answer.push_back(true);
+            } else {
+                answer.push_back(false);
+            }
+        }
+        
+        return answer;
+    }
+};
